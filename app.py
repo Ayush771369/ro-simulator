@@ -2,15 +2,23 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Import model functions
 from model import *
-from plots import *
 
+# Import plotting functions
+from plots import (
+    generate_oat_plots,
+    generate_tornado,
+    generate_heatmap,
+    generate_simulation_dashboard
+)
+
+# -------------------------------
+# PAGE CONFIG
+# -------------------------------
 st.set_page_config(page_title="RO Simulator", layout="wide")
 
-# -------------------------------
-# TITLE
-# -------------------------------
-st.title("💧 RO Process Simulator")
+st.title("💧 Reverse Osmosis Process Simulator")
 
 # -------------------------------
 # SIDEBAR INPUTS
@@ -36,7 +44,7 @@ B = st.sidebar.number_input(
 Am = st.sidebar.slider("Membrane Area (m²)", 100, 5000, 1000)
 
 # -------------------------------
-# BASELINE DICT (IMPORTANT FIX)
+# BASELINE (for plots)
 # -------------------------------
 baseline = {
     "delta_P": delta_P,
@@ -50,12 +58,13 @@ baseline = {
 # -------------------------------
 # TABS
 # -------------------------------
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "Simulator",
     "OAT Analysis",
     "Tornado",
     "Heatmap",
-    "Equations"
+    "Equations",
+    "Process Dashboard"
 ])
 
 # ============================================================
@@ -77,11 +86,11 @@ with tab1:
     col4.metric("Flow Rate Qp (m³/h)", f"{Qp:.2f}")
 
     if delta_P < pi:
-        st.warning("⚠️ Applied pressure is less than osmotic pressure → No filtration!")
+        st.warning("⚠️ Applied pressure is less than osmotic pressure → No filtration occurs!")
 
     st.divider()
 
-    # Extra plot
+    # Extra graph
     st.subheader("📈 Pressure vs Water Flux")
 
     pressure_range = np.linspace(20, 80, 50)
@@ -128,58 +137,49 @@ with tab4:
 with tab5:
     st.header("📘 Governing Equations")
 
-    # -------------------
     st.subheader("Osmotic Pressure")
     st.latex(r"\pi = i \cdot C \cdot R \cdot T")
 
     st.markdown("""
     - π = Osmotic Pressure (bar)  
     - i = van’t Hoff factor  
-    - C = Concentration (mol/m³)  
+    - C = Concentration  
     - R = Gas constant  
-    - T = Temperature (K)  
+    - T = Temperature (K)
     """)
 
     st.divider()
 
-    # -------------------
     st.subheader("Water Flux")
     st.latex(r"J_w = A \cdot (\Delta P - \pi)")
 
     st.markdown("""
-    - Jw = Water flux (LMH)  
+    - Jw = Water flux  
     - A = Membrane permeability  
     - ΔP = Applied pressure  
-    - π = Osmotic pressure  
     """)
 
     st.divider()
 
-    # -------------------
     st.subheader("Salt Rejection")
     st.latex(r"R = \left(1 - \frac{C_p}{C_f}\right) \times 100")
 
     st.markdown("""
     - R = Salt rejection (%)  
-    - Cp = Permeate concentration  
-    - Cf = Feed concentration  
     """)
 
     st.divider()
 
-    # -------------------
     st.subheader("Permeate Flow Rate")
     st.latex(r"Q_p = J_w \cdot A_m")
 
     st.markdown("""
-    - Qp = Flow rate (m³/h)  
-    - Am = Membrane area  
+    - Qp = Flow rate  
     """)
 
     st.divider()
 
-    # -------------------
-    st.subheader("Model Implementation (Code Logic)")
+    st.subheader("Model Code Logic")
 
     st.code("""
 Jw = A * max((ΔP - π), 0)
@@ -187,3 +187,17 @@ Cp = B * Cs / (Jw + B)
 R  = (1 - Cp / Cf) * 100
 Qp = Jw * Am
 """)
+
+# ============================================================
+# TAB 6 — PROCESS DASHBOARD
+# ============================================================
+with tab6:
+    st.header("📊 Process Simulation Dashboard")
+
+    st.markdown("""
+    This dashboard visualizes the complete behavior of the reverse osmosis system
+    under typical operating conditions.
+    """)
+
+    fig = generate_simulation_dashboard()
+    st.pyplot(fig)

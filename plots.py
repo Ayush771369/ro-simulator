@@ -84,3 +84,80 @@ def generate_heatmap(baseline):
     sns.heatmap(data, annot=True, ax=ax)
 
     return fig
+
+def generate_simulation_dashboard():
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import matplotlib.gridspec as gridspec
+
+    R_GAS = 8.314
+    i = 2
+    A = 3.5e-12
+    B = 3.5e-8
+
+    def osmotic_pressure(C, T):
+        return i * C * 1000 * R_GAS * T
+
+    def water_flux(P, pi):
+        return A * np.maximum(P - pi, 0)
+
+    def rejection(Jw, Cs):
+        return 100 * (1 - (B * Cs / (Jw + B)) / Cs)
+
+    def flow(Jw, Am):
+        return Jw * Am
+
+    # Base values
+    T = 298.15
+    C = 0.6
+    pi = osmotic_pressure(C, T)
+
+    # Ranges
+    C_range = np.linspace(0.01, 1.2, 200)
+    pi_vals = osmotic_pressure(C_range, T) / 1e5
+
+    P_range = np.linspace(0, 80, 200)
+    P_Pa = P_range * 1e5
+    Jw = water_flux(P_Pa, pi) * 3600 * 1000
+
+    # Rejection
+    P2 = np.linspace(30, 80, 200)
+    Jw2 = water_flux(P2 * 1e5, pi)
+    Cs = C * 1000 * 1.15
+    Cp = B * Cs / (Jw2 + B)
+    R = 100 * (1 - Cp / (C * 1000))
+
+    # Flow
+    Am_range = np.linspace(10, 5000, 200)
+    Jw60 = water_flux(60e5, pi)
+    Qp = flow(Jw60, Am_range) * 3600
+
+    # Temp
+    T_range = np.linspace(5, 45, 100)
+    pi_T = osmotic_pressure(C, T_range + 273.15) / 1e5
+
+    # Plot
+    fig = plt.figure(figsize=(16, 10))
+    gs = gridspec.GridSpec(2, 3)
+
+    ax1 = fig.add_subplot(gs[0, 0])
+    ax1.plot(C_range, pi_vals)
+    ax1.set_title("π vs C")
+
+    ax2 = fig.add_subplot(gs[0, 1])
+    ax2.plot(P_range, Jw)
+    ax2.set_title("Jw vs Pressure")
+
+    ax3 = fig.add_subplot(gs[0, 2])
+    ax3.plot(P2, R)
+    ax3.set_title("Rejection vs Pressure")
+
+    ax4 = fig.add_subplot(gs[1, 0])
+    ax4.plot(Am_range, Qp)
+    ax4.set_title("Flow vs Area")
+
+    ax5 = fig.add_subplot(gs[1, 1])
+    ax5.plot(T_range, pi_T)
+    ax5.set_title("π vs Temperature")
+
+    return fig
