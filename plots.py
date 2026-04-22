@@ -43,33 +43,37 @@ def generate_oat_plots(baseline):
 
 # ---------- TORNADO ----------
 def generate_tornado(baseline):
+    import matplotlib.pyplot as plt
+
     variation = 0.2
     params = ["delta_P", "C", "T", "A", "B"]
 
-    base_vals = [
-        water_flux_LMH(**baseline),
-        salt_rejection_pct(**baseline),
-        permeate_flow_m3h(**baseline),
-        osmotic_pressure_bar(baseline["C"], baseline["T"]),
-    ]
+    def compute(b):
+        return water_flux_LMH(
+            b["delta_P"],
+            b["C"],
+            b["T"],
+            b["A"]
+        )
+
+    base_val = compute(baseline)
 
     fig, ax = plt.subplots(figsize=(8, 6))
 
-    for i, param in enumerate(params):
+    for param in params:
         low = baseline.copy()
         high = baseline.copy()
 
         low[param] *= (1 - variation)
         high[param] *= (1 + variation)
 
-        low_val = water_flux_LMH(**low)
-        high_val = water_flux_LMH(**high)
+        low_val = compute(low)
+        high_val = compute(high)
 
         ax.barh(param, high_val - low_val)
 
+    ax.set_title("Tornado Chart (Impact on Water Flux)")
     return fig
-
-
 # ---------- HEATMAP ----------
 def generate_heatmap(baseline):
     import seaborn as sns

@@ -10,8 +10,8 @@ st.title("💧 RO Process Simulator")
 delta_P = st.sidebar.slider("Pressure", 10.0, 100.0, 60.0)
 C = st.sidebar.slider("Concentration", 0.1, 1.5, 0.6)
 T = st.sidebar.slider("Temperature", 5.0, 60.0, 25.0)
-A = st.sidebar.number_input("A", value=3.5e-12)
-B = st.sidebar.number_input("B", value=3.5e-8)
+A = st.sidebar.number_input("A", value=3.5e-12, format="%.2e")
+B = st.sidebar.number_input("B", value=3.5e-8, format="%.2e")
 Am = st.sidebar.slider("Area", 100, 5000, 1000)
 
 baseline = {
