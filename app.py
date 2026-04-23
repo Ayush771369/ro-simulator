@@ -2,10 +2,7 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Import model functions
 from model import *
-
-# Import plotting functions
 from plots import (
     generate_oat_plots,
     generate_tornado,
@@ -29,22 +26,12 @@ delta_P = st.sidebar.slider("Pressure ΔP (bar)", 10.0, 100.0, 60.0)
 C = st.sidebar.slider("Concentration (mol/L)", 0.1, 1.5, 0.6)
 T = st.sidebar.slider("Temperature (°C)", 5.0, 60.0, 25.0)
 
-A = st.sidebar.number_input(
-    "Water Permeability A",
-    value=3.5e-12,
-    format="%.2e"
-)
-
-B = st.sidebar.number_input(
-    "Salt Permeability B",
-    value=3.5e-8,
-    format="%.2e"
-)
-
+A = st.sidebar.number_input("Water Permeability A", value=3.5e-12, format="%.2e")
+B = st.sidebar.number_input("Salt Permeability B", value=3.5e-8, format="%.2e")
 Am = st.sidebar.slider("Membrane Area (m²)", 100, 5000, 1000)
 
 # -------------------------------
-# BASELINE (for plots)
+# BASELINE
 # -------------------------------
 baseline = {
     "delta_P": delta_P,
@@ -58,11 +45,9 @@ baseline = {
 # -------------------------------
 # TABS
 # -------------------------------
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
+tab1, tab2, tab3 = st.tabs([
     "Simulator",
-    "OAT Analysis",
-    "Tornado",
-    "Heatmap",
+    "Sensitivity Analysis",
     "Equations"
 ])
 
@@ -88,50 +73,43 @@ with tab1:
         st.warning("⚠️ Applied pressure is less than osmotic pressure → No filtration occurs!")
 
     # -------------------------------
-    # PROCESS DASHBOARD (MOVED HERE)
+    # PROCESS DASHBOARD
     # -------------------------------
     st.divider()
     st.subheader("📊 Process Simulation Dashboard")
-
-    st.markdown("""
-    This dashboard visualizes the overall behavior of the reverse osmosis system
-    under standard operating conditions.
-    """)
 
     fig = generate_simulation_dashboard()
     st.pyplot(fig)
 
 # ============================================================
-# TAB 2 — OAT
+# TAB 2 — SENSITIVITY ANALYSIS
 # ============================================================
 with tab2:
-    st.subheader("📊 OAT Sensitivity Analysis")
+    st.header("📊 Sensitivity Analysis")
 
-    fig = generate_oat_plots(baseline)
-    st.pyplot(fig)
+    # -------- OAT --------
+    st.subheader("🔍 One-at-a-Time (OAT) Analysis")
+    fig_oat = generate_oat_plots(baseline)
+    st.pyplot(fig_oat)
+
+    st.divider()
+
+    # -------- TORNADO --------
+    st.subheader("🌪️ Tornado Chart")
+    fig_tornado = generate_tornado(baseline)
+    st.pyplot(fig_tornado)
+
+    st.divider()
+
+    # -------- HEATMAP --------
+    st.subheader("🔥 Sensitivity Heatmap")
+    fig_heatmap = generate_heatmap(baseline)
+    st.pyplot(fig_heatmap)
 
 # ============================================================
-# TAB 3 — TORNADO
+# TAB 3 — EQUATIONS
 # ============================================================
 with tab3:
-    st.subheader("🌪️ Tornado Chart")
-
-    fig = generate_tornado(baseline)
-    st.pyplot(fig)
-
-# ============================================================
-# TAB 4 — HEATMAP
-# ============================================================
-with tab4:
-    st.subheader("🔥 Sensitivity Heatmap")
-
-    fig = generate_heatmap(baseline)
-    st.pyplot(fig)
-
-# ============================================================
-# TAB 5 — EQUATIONS
-# ============================================================
-with tab5:
     st.header("📘 Governing Equations")
 
     st.subheader("Osmotic Pressure")
@@ -150,29 +128,15 @@ with tab5:
     st.subheader("Water Flux")
     st.latex(r"J_w = A \cdot (\Delta P - \pi)")
 
-    st.markdown("""
-    - Jw = Water flux  
-    - A = Membrane permeability  
-    - ΔP = Applied pressure  
-    """)
-
     st.divider()
 
     st.subheader("Salt Rejection")
     st.latex(r"R = \left(1 - \frac{C_p}{C_f}\right) \times 100")
 
-    st.markdown("""
-    - R = Salt rejection (%)  
-    """)
-
     st.divider()
 
     st.subheader("Permeate Flow Rate")
     st.latex(r"Q_p = J_w \cdot A_m")
-
-    st.markdown("""
-    - Qp = Flow rate  
-    """)
 
     st.divider()
 
