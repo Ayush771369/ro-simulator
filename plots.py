@@ -110,6 +110,9 @@ def generate_heatmap(baseline):
 
     VARIATION = 0.20
 
+    # -------------------------------
+    # Labels
+    # -------------------------------
     param_labels = [
         "Applied Pressure ΔP",
         "Feed Concentration C",
@@ -158,7 +161,6 @@ def generate_heatmap(baseline):
 
             base_val = base_out[j]
 
-            # % change normalized
             lo_change = (low_out - base_val) / (base_val + 1e-12)
             hi_change = (high_out - base_val) / (base_val + 1e-12)
 
@@ -166,28 +168,32 @@ def generate_heatmap(baseline):
             SI_matrix[i, j] = SI
 
     # -------------------------------
-    # PLOT
+    # PLOTTING
     # -------------------------------
     fig, ax = plt.subplots(figsize=(10, 5))
 
+    # Use light colormap for black text visibility
     im = ax.imshow(SI_matrix, cmap="YlOrRd", aspect="auto")
 
     # Axis labels
     ax.set_xticks(range(len(output_labels)))
-    ax.set_xticklabels(output_labels, fontsize=9)
+    ax.set_xticklabels(output_labels, fontsize=10)
 
     ax.set_yticks(range(len(param_labels)))
-    ax.set_yticklabels(param_labels, fontsize=9)
+    ax.set_yticklabels(param_labels, fontsize=10)
 
-    # Cell annotations
+    # -------------------------------
+    # BLACK TEXT ANNOTATIONS (FIXED)
+    # -------------------------------
     for i in range(len(param_labels)):
         for j in range(len(output_labels)):
             val = SI_matrix[i, j]
             ax.text(
                 j, i, f"{val:.2f}",
-                ha="center", va="center",
-                fontsize=9,
-                color="black" if val > 0.6 else "white",
+                ha="center",
+                va="center",
+                fontsize=10,
+                color="black",
                 fontweight="bold"
             )
 
@@ -199,7 +205,7 @@ def generate_heatmap(baseline):
 
     # Colorbar
     cbar = plt.colorbar(im, ax=ax)
-    cbar.set_label("Sensitivity Index  (|ΔOutput%| / |ΔInput%|)")
+    cbar.set_label("Sensitivity Index (|ΔOutput%| / |ΔInput%|)")
 
     fig.tight_layout()
 
