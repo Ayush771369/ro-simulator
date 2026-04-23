@@ -105,12 +105,103 @@ def generate_tornado(baseline):
     return fig
 # ---------- HEATMAP ----------
 def generate_heatmap(baseline):
-    import seaborn as sns
+    import numpy as np
+    import matplotlib.pyplot as plt
 
-    data = np.random.rand(5, 4)  # placeholder (can replace with real SI)
+    VARIATION = 0.20
 
-    fig, ax = plt.subplots()
-    sns.heatmap(data, annot=True, ax=ax)
+    param_labels = [
+        "Applied Pressure ΔP",
+        "Feed Concentration C",
+        "Temperature T",
+        "Water Perm. A",
+        "Salt Perm. B",
+    ]
+
+    output_labels = [
+        "Jw (L/m²·h)",
+        "Salt Rejection (%)",
+        "Permeate Flow (m³/h)",
+        "Osmotic Pressure (bar)"
+    ]
+
+    # -------------------------------
+    # Helper function
+    # -------------------------------
+    def compute_outputs(b):
+        pi = osmotic_pressure_bar(b["C"], b["T"])
+        Jw = water_flux_LMH(b["delta_P"], b["C"], b["T"], b["A"])
+        R  = salt_rejection_pct(b["delta_P"], b["C"], b["T"], b["A"], b["B"])
+        Qp = permeate_flow_m3h(b["delta_P"], b["C"], b["T"], b["A"], b["B"], b["Am"])
+        return [Jw, R, Qp, pi]
+
+    base_out = compute_outputs(baseline)
+
+    param_keys = ["delta_P", "C", "T", "A", "B"]
+
+    SI_matrix = np.zeros((len(param_keys), len(output_labels)))
+
+    # -------------------------------
+    # Sensitivity Index Calculation
+    # -------------------------------
+    for i, key in enumerate(param_keys):
+        for j in range(len(output_labels)):
+
+            low = baseline.copy()
+            high = baseline.copy()
+
+            low[key] *= (1 - VARIATION)
+            high[key] *= (1 + VARIATION)
+
+            low_out = compute_outputs(low)[j]
+            high_out = compute_outputs(high)[j]
+
+            base_val = base_out[j]
+
+            # % change normalized
+            lo_change = (low_out - base_val) / (base_val + 1e-12)
+            hi_change = (high_out - base_val) / (base_val + 1e-12)
+
+            SI = (abs(lo_change) + abs(hi_change)) / 2 / VARIATION
+            SI_matrix[i, j] = SI
+
+    # -------------------------------
+    # PLOT
+    # -------------------------------
+    fig, ax = plt.subplots(figsize=(10, 5))
+
+    im = ax.imshow(SI_matrix, cmap="YlOrRd", aspect="auto")
+
+    # Axis labels
+    ax.set_xticks(range(len(output_labels)))
+    ax.set_xticklabels(output_labels, fontsize=9)
+
+    ax.set_yticks(range(len(param_labels)))
+    ax.set_yticklabels(param_labels, fontsize=9)
+
+    # Cell annotations
+    for i in range(len(param_labels)):
+        for j in range(len(output_labels)):
+            val = SI_matrix[i, j]
+            ax.text(
+                j, i, f"{val:.2f}",
+                ha="center", va="center",
+                fontsize=9,
+                color="black" if val > 0.6 else "white",
+                fontweight="bold"
+            )
+
+    # Title
+    ax.set_title(
+        "Sensitivity Index Heatmap\nHigher value = output is MORE sensitive",
+        fontsize=12
+    )
+
+    # Colorbar
+    cbar = plt.colorbar(im, ax=ax)
+    cbar.set_label("Sensitivity Index  (|ΔOutput%| / |ΔInput%|)")
+
+    fig.tight_layout()
 
     return fig
 
