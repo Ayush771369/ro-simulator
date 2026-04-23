@@ -170,7 +170,7 @@ def generate_heatmap(baseline):
     # -------------------------------
     fig, ax = plt.subplots(figsize=(10, 5))
 
-    im = ax.imshow(SI_matrix, cmap="YlOrRd", aspect="auto")
+    im = ax.imshow(SI_matrix, cmap="inferno", aspect="auto")
 
     # Axis labels
     ax.set_xticks(range(len(output_labels)))
