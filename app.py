@@ -118,17 +118,12 @@ with tab2:
 
     st.divider()
 
-    # -------------------------------
-    # PROCESS DASHBOARD
-    # -------------------------------
     st.subheader("📊 Process Simulation Dashboard")
     fig = generate_simulation_dashboard()
     st.pyplot(fig)
 
-    # -------------------------------
-    # KEY OBSERVATIONS (NEW)
-    # -------------------------------
     st.divider()
+
     st.header("📌 Key Simulation Observations")
 
     st.markdown("""
@@ -138,19 +133,17 @@ with tab2:
 
 - **Water Flux vs. Applied Pressure:**  
   Below the osmotic pressure threshold (~30 bar), no water flux occurs.  
-  Above this threshold, flux increases linearly with applied pressure, following the solution-diffusion model.
+  Above this threshold, flux increases linearly with applied pressure.
 
 - **Salt Rejection vs. Pressure:**  
-  As applied pressure increases, water flux increases while salt flux remains approximately constant (concentration-driven),  
-  resulting in improved salt rejection reaching ~99.6% at higher pressures.
+  As pressure increases, water flux increases while salt flux remains approximately constant,  
+  leading to high rejection (~99.6%).
 
 - **Permeate Flow vs. Membrane Area:**  
-  Total water production scales linearly with membrane area.  
-  A 1000 m² system at 60 bar produces significant permeate flow, demonstrating scalability.
+  Flow increases linearly with membrane area, showing scalability.
 
 - **Temperature Effect:**  
-  Osmotic pressure increases proportionally with absolute temperature.  
-  Higher temperatures increase osmotic pressure, requiring higher operating pressures.
+  Higher temperature increases osmotic pressure, requiring higher operating pressure.
 """)
 
 # ============================================================
@@ -176,36 +169,17 @@ with tab3:
     st.pyplot(fig_heatmap)
 
 # ============================================================
-# TAB 4 — FUTURE PROSPECTS
+# TAB 4 — FUTURE PROSPECTS (UPDATED)
 # ============================================================
 with tab4:
     st.header("🚀 Future Prospects")
 
     st.markdown("""
-This project provides a strong foundation for developing a full-scale digital simulator of reverse osmosis systems.
+- Incorporate **energy consumption modelling** (specific energy = ΔP / recovery ratio) to evaluate economic performance  
 
-### 🔧 Model Enhancements
-- Multi-stage RO systems  
-- Energy consumption modeling  
-- Fouling and scaling effects  
+- Develop a **full plant simulation** with multiple stages, recirculation loops, and energy recovery devices  
 
-### 📊 Advanced Analysis
-- Optimization of operating conditions  
-- Multi-variable sensitivity analysis  
+- Include **membrane fouling models** (cake filtration, pore blocking) to simulate long-term flux decline  
 
-### 🤖 AI Integration
-- Machine learning for performance prediction  
-- Smart recommendation systems  
-
-### 🌐 Product Development
-- Full-stack deployment  
-- User data storage and simulations  
-
-### 🧪 Research Extensions
-- Extend to other membrane processes  
-- Industrial-scale simulation  
-
----
-
-👉 This project can evolve into a **digital twin of membrane systems** bridging theory and real-world applications.
+- Extend sensitivity analysis using **Monte Carlo simulation** for probabilistic performance assessment  
 """)
