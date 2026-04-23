@@ -43,12 +43,13 @@ baseline = {
 }
 
 # -------------------------------
-# TABS (UPDATED)
+# TABS
 # -------------------------------
-tab1, tab2, tab3 = st.tabs([
+tab1, tab2, tab3, tab4 = st.tabs([
     "Overview",
     "Simulator",
-    "Sensitivity Analysis"
+    "Sensitivity Analysis",
+    "Future Prospects"
 ])
 
 # ============================================================
@@ -59,13 +60,12 @@ with tab1:
 
     st.markdown("""
 This project presents a comprehensive simulation and analysis of a **Reverse Osmosis (RO) desalination system**, 
-which is widely used for converting saline water into potable water. The simulator models key transport phenomena 
-including osmotic pressure, water flux through the membrane, salt rejection, and permeate flow rate.
+widely used for converting saline water into potable water. The simulator models key transport phenomena such as 
+osmotic pressure, water flux, salt rejection, and permeate flow rate.
 
-The platform combines **real-time simulation, sensitivity analysis, and system-level visualization** to provide a 
-deep understanding of how operating parameters such as pressure, temperature, concentration, and membrane properties 
-affect the overall performance of the RO process. It serves as both an engineering tool and an educational interface 
-for studying membrane separation systems.
+The platform integrates **real-time simulation, sensitivity analysis, and system-level visualization** to provide 
+insight into how parameters like pressure, temperature, concentration, and membrane properties affect system performance. 
+It serves both as an engineering tool and an educational interface for membrane separation processes.
 """)
 
     st.divider()
@@ -90,23 +90,17 @@ for studying membrane separation systems.
     st.subheader("Water Flux")
     st.latex(r"J_w = A \cdot (\Delta P - \pi)")
 
-    st.markdown("""
-- Jw = Water flux  
-- A = Membrane permeability  
-- ΔP = Applied pressure  
-""")
-
     st.divider()
 
-    # Salt Flux (NEW)
+    # Salt Flux
     st.subheader("Salt Flux")
     st.latex(r"J_s = B \cdot (C_s - C_p)")
 
     st.markdown("""
 - Js = Salt flux  
 - B = Salt permeability  
-- Cs = Concentration at membrane surface  
-- Cp = Permeate concentration  
+- Cs = membrane surface concentration  
+- Cp = permeate concentration  
 """)
 
     st.divider()
@@ -145,6 +139,7 @@ with tab2:
     st.divider()
 
     st.subheader("📊 Process Simulation Dashboard")
+
     fig = generate_simulation_dashboard()
     st.pyplot(fig)
 
@@ -169,3 +164,46 @@ with tab3:
     st.subheader("🔥 Sensitivity Heatmap")
     fig_heatmap = generate_heatmap(baseline)
     st.pyplot(fig_heatmap)
+
+# ============================================================
+# TAB 4 — FUTURE PROSPECTS
+# ============================================================
+with tab4:
+    st.header("🚀 Future Prospects")
+
+    st.markdown("""
+This project provides a strong foundation for developing a full-scale digital simulator of reverse osmosis systems. 
+Several enhancements can be made to extend its capabilities toward industrial and research applications.
+
+### 🔧 Model Enhancements
+- Multi-stage RO system simulation  
+- Energy consumption and efficiency modeling  
+- Fouling and scaling effects  
+- Pressure drop and realistic flow modeling  
+
+### 📊 Advanced Analysis
+- Multi-variable sensitivity analysis  
+- Optimization of operating conditions  
+- Uncertainty and robustness analysis  
+
+### 🤖 AI Integration
+- Machine learning for performance prediction  
+- Smart parameter recommendation systems  
+- Integration with real plant datasets  
+
+### 🌐 Product Development
+- Full-stack deployment (React + FastAPI)  
+- User authentication and saved simulations  
+- Data upload and custom simulations  
+- Cloud-based engineering tool  
+
+### 🧪 Research Extensions
+- Extend to nanofiltration and ultrafiltration  
+- Industrial plant-scale simulation  
+- CFD-based flow modeling  
+
+---
+
+👉 This project can evolve into a **complete digital twin of membrane separation systems**, 
+bridging theoretical modeling with real-world engineering applications.
+""")
