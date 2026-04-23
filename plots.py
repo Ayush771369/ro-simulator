@@ -4,38 +4,67 @@ from model import *
 
 # ---------- OAT PLOT ----------
 def generate_oat_plots(baseline):
+    import numpy as np
+    import matplotlib.pyplot as plt
+
     N = 100
 
     params = {
-        "Pressure": np.linspace(35, 80, N),
-        "Concentration": np.linspace(0.1, 1.2, N),
-        "Temperature": np.linspace(5, 45, N),
-        "A": np.linspace(1e-12, 7e-12, N),
-        "B": np.linspace(0.5e-8, 8e-8, N),
+        "Pressure ΔP (bar)": np.linspace(35, 80, N),
+        "Concentration C (mol/L)": np.linspace(0.1, 1.2, N),
+        "Temperature T (°C)": np.linspace(5, 45, N),
+        "Permeability A": np.linspace(1e-12, 7e-12, N),
+        "Salt Perm. B": np.linspace(0.5e-8, 8e-8, N),
     }
 
-    fig, axes = plt.subplots(5, 4, figsize=(16, 12))
+    outputs = [
+        ("Water Flux Jw", "LMH"),
+        ("Salt Rejection R", "%"),
+        ("Permeate Flow Qp", "m³/h"),
+        ("Osmotic Pressure π", "bar")
+    ]
 
-    for i, (param, values) in enumerate(params.items()):
-        for j in range(4):
+    fig, axes = plt.subplots(5, 4, figsize=(18, 14))
+
+    for i, (param_name, values) in enumerate(params.items()):
+        for j, (out_name, unit) in enumerate(outputs):
+
             y = []
 
             for val in values:
-                dP = val if param == "Pressure" else baseline["delta_P"]
-                C  = val if param == "Concentration" else baseline["C"]
-                T  = val if param == "Temperature" else baseline["T"]
-                A  = val if param == "A" else baseline["A"]
-                B  = val if param == "B" else baseline["B"]
+                dP = val if "Pressure" in param_name else baseline["delta_P"]
+                C  = val if "Concentration" in param_name else baseline["C"]
+                T  = val if "Temperature" in param_name else baseline["T"]
+                A  = val if "Permeability A" in param_name else baseline["A"]
+                B  = val if "Salt Perm" in param_name else baseline["B"]
 
                 pi = osmotic_pressure_bar(C, T)
                 Jw = water_flux_LMH(dP, C, T, A)
                 R  = salt_rejection_pct(dP, C, T, A, B)
                 Qp = permeate_flow_m3h(dP, C, T, A, B, baseline["Am"])
 
-                outputs = [Jw, R, Qp, pi]
-                y.append(outputs[j])
+                outputs_vals = [Jw, R, Qp, pi]
+                y.append(outputs_vals[j])
 
-            axes[i, j].plot(values, y)
+            ax = axes[i, j]
+
+            ax.plot(values, y, linewidth=1.8)
+            ax.grid(True, alpha=0.3)
+
+            # -------------------------------
+            # LABELS (IMPORTANT PART)
+            # -------------------------------
+            if i == 0:
+                ax.set_title(f"{out_name} ({unit})", fontsize=9)
+
+            if j == 0:
+                ax.set_ylabel(param_name, fontsize=8)
+
+            if i == 4:
+                ax.set_xlabel(param_name, fontsize=8)
+
+            # Optional: cleaner ticks
+            ax.tick_params(labelsize=7)
 
     fig.tight_layout()
     return fig
