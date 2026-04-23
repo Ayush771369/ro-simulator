@@ -43,18 +43,88 @@ baseline = {
 }
 
 # -------------------------------
-# TABS
+# TABS (UPDATED)
 # -------------------------------
 tab1, tab2, tab3 = st.tabs([
+    "Overview",
     "Simulator",
-    "Sensitivity Analysis",
-    "Equations"
+    "Sensitivity Analysis"
 ])
 
 # ============================================================
-# TAB 1 — SIMULATOR
+# TAB 1 — OVERVIEW
 # ============================================================
 with tab1:
+    st.header("📘 Project Overview")
+
+    st.markdown("""
+This project presents a comprehensive simulation and analysis of a **Reverse Osmosis (RO) desalination system**, 
+which is widely used for converting saline water into potable water. The simulator models key transport phenomena 
+including osmotic pressure, water flux through the membrane, salt rejection, and permeate flow rate.
+
+The platform combines **real-time simulation, sensitivity analysis, and system-level visualization** to provide a 
+deep understanding of how operating parameters such as pressure, temperature, concentration, and membrane properties 
+affect the overall performance of the RO process. It serves as both an engineering tool and an educational interface 
+for studying membrane separation systems.
+""")
+
+    st.divider()
+
+    st.header("📐 Governing Equations")
+
+    # Osmotic Pressure
+    st.subheader("Osmotic Pressure")
+    st.latex(r"\pi = i \cdot C \cdot R \cdot T")
+
+    st.markdown("""
+- π = Osmotic Pressure  
+- i = van’t Hoff factor  
+- C = Concentration  
+- R = Gas constant  
+- T = Temperature (K)  
+""")
+
+    st.divider()
+
+    # Water Flux
+    st.subheader("Water Flux")
+    st.latex(r"J_w = A \cdot (\Delta P - \pi)")
+
+    st.markdown("""
+- Jw = Water flux  
+- A = Membrane permeability  
+- ΔP = Applied pressure  
+""")
+
+    st.divider()
+
+    # Salt Flux (NEW)
+    st.subheader("Salt Flux")
+    st.latex(r"J_s = B \cdot (C_s - C_p)")
+
+    st.markdown("""
+- Js = Salt flux  
+- B = Salt permeability  
+- Cs = Concentration at membrane surface  
+- Cp = Permeate concentration  
+""")
+
+    st.divider()
+
+    # Salt Rejection
+    st.subheader("Salt Rejection")
+    st.latex(r"R = \left(1 - \frac{C_p}{C_f}\right) \times 100")
+
+    st.divider()
+
+    # Flow Rate
+    st.subheader("Permeate Flow Rate")
+    st.latex(r"Q_p = J_w \cdot A_m")
+
+# ============================================================
+# TAB 2 — SIMULATOR
+# ============================================================
+with tab2:
     st.subheader("📊 Results")
 
     pi = osmotic_pressure_bar(C, T)
@@ -72,79 +142,30 @@ with tab1:
     if delta_P < pi:
         st.warning("⚠️ Applied pressure is less than osmotic pressure → No filtration occurs!")
 
-    # -------------------------------
-    # PROCESS DASHBOARD
-    # -------------------------------
     st.divider()
-    st.subheader("📊 Process Simulation Dashboard")
 
+    st.subheader("📊 Process Simulation Dashboard")
     fig = generate_simulation_dashboard()
     st.pyplot(fig)
 
 # ============================================================
-# TAB 2 — SENSITIVITY ANALYSIS
+# TAB 3 — SENSITIVITY ANALYSIS
 # ============================================================
-with tab2:
+with tab3:
     st.header("📊 Sensitivity Analysis")
 
-    # -------- OAT --------
     st.subheader("🔍 One-at-a-Time (OAT) Analysis")
     fig_oat = generate_oat_plots(baseline)
     st.pyplot(fig_oat)
 
     st.divider()
 
-    # -------- TORNADO --------
     st.subheader("🌪️ Tornado Chart")
     fig_tornado = generate_tornado(baseline)
     st.pyplot(fig_tornado)
 
     st.divider()
 
-    # -------- HEATMAP --------
     st.subheader("🔥 Sensitivity Heatmap")
     fig_heatmap = generate_heatmap(baseline)
     st.pyplot(fig_heatmap)
-
-# ============================================================
-# TAB 3 — EQUATIONS
-# ============================================================
-with tab3:
-    st.header("📘 Governing Equations")
-
-    st.subheader("Osmotic Pressure")
-    st.latex(r"\pi = i \cdot C \cdot R \cdot T")
-
-    st.markdown("""
-    - π = Osmotic Pressure (bar)  
-    - i = van’t Hoff factor  
-    - C = Concentration  
-    - R = Gas constant  
-    - T = Temperature (K)
-    """)
-
-    st.divider()
-
-    st.subheader("Water Flux")
-    st.latex(r"J_w = A \cdot (\Delta P - \pi)")
-
-    st.divider()
-
-    st.subheader("Salt Rejection")
-    st.latex(r"R = \left(1 - \frac{C_p}{C_f}\right) \times 100")
-
-    st.divider()
-
-    st.subheader("Permeate Flow Rate")
-    st.latex(r"Q_p = J_w \cdot A_m")
-
-    st.divider()
-
-    st.subheader("Model Code Logic")
-
-    st.code("""
-Jw = A * max((ΔP - π), 0)
-Cp = B * Cs / (Jw + B)
-R  = (1 - Cp / Cf) * 100
-Qp = Jw * Am
-""")
