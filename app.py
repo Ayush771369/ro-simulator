@@ -72,46 +72,26 @@ It serves both as an engineering tool and an educational interface for membrane 
 
     st.header("📐 Governing Equations")
 
-    # Osmotic Pressure
     st.subheader("Osmotic Pressure")
     st.latex(r"\pi = i \cdot C \cdot R \cdot T")
 
-    st.markdown("""
-- π = Osmotic Pressure  
-- i = van’t Hoff factor  
-- C = Concentration  
-- R = Gas constant  
-- T = Temperature (K)  
-""")
-
     st.divider()
 
-    # Water Flux
     st.subheader("Water Flux")
     st.latex(r"J_w = A \cdot (\Delta P - \pi)")
 
     st.divider()
 
-    # Salt Flux
     st.subheader("Salt Flux")
     st.latex(r"J_s = B \cdot (C_s - C_p)")
 
-    st.markdown("""
-- Js = Salt flux  
-- B = Salt permeability  
-- Cs = membrane surface concentration  
-- Cp = permeate concentration  
-""")
-
     st.divider()
 
-    # Salt Rejection
     st.subheader("Salt Rejection")
     st.latex(r"R = \left(1 - \frac{C_p}{C_f}\right) \times 100")
 
     st.divider()
 
-    # Flow Rate
     st.subheader("Permeate Flow Rate")
     st.latex(r"Q_p = J_w \cdot A_m")
 
@@ -138,10 +118,40 @@ with tab2:
 
     st.divider()
 
+    # -------------------------------
+    # PROCESS DASHBOARD
+    # -------------------------------
     st.subheader("📊 Process Simulation Dashboard")
-
     fig = generate_simulation_dashboard()
     st.pyplot(fig)
+
+    # -------------------------------
+    # KEY OBSERVATIONS (NEW)
+    # -------------------------------
+    st.divider()
+    st.header("📌 Key Simulation Observations")
+
+    st.markdown("""
+- **Osmotic Pressure vs. Concentration:**  
+  Osmotic pressure increases linearly with salt concentration as described by the van’t Hoff equation.  
+  Seawater at 0.6 mol/L gives π ≈ 29.75 bar, confirming that RO systems must operate above 30 bar.
+
+- **Water Flux vs. Applied Pressure:**  
+  Below the osmotic pressure threshold (~30 bar), no water flux occurs.  
+  Above this threshold, flux increases linearly with applied pressure, following the solution-diffusion model.
+
+- **Salt Rejection vs. Pressure:**  
+  As applied pressure increases, water flux increases while salt flux remains approximately constant (concentration-driven),  
+  resulting in improved salt rejection reaching ~99.6% at higher pressures.
+
+- **Permeate Flow vs. Membrane Area:**  
+  Total water production scales linearly with membrane area.  
+  A 1000 m² system at 60 bar produces significant permeate flow, demonstrating scalability.
+
+- **Temperature Effect:**  
+  Osmotic pressure increases proportionally with absolute temperature.  
+  Higher temperatures increase osmotic pressure, requiring higher operating pressures.
+""")
 
 # ============================================================
 # TAB 3 — SENSITIVITY ANALYSIS
@@ -172,38 +182,30 @@ with tab4:
     st.header("🚀 Future Prospects")
 
     st.markdown("""
-This project provides a strong foundation for developing a full-scale digital simulator of reverse osmosis systems. 
-Several enhancements can be made to extend its capabilities toward industrial and research applications.
+This project provides a strong foundation for developing a full-scale digital simulator of reverse osmosis systems.
 
 ### 🔧 Model Enhancements
-- Multi-stage RO system simulation  
-- Energy consumption and efficiency modeling  
+- Multi-stage RO systems  
+- Energy consumption modeling  
 - Fouling and scaling effects  
-- Pressure drop and realistic flow modeling  
 
 ### 📊 Advanced Analysis
-- Multi-variable sensitivity analysis  
 - Optimization of operating conditions  
-- Uncertainty and robustness analysis  
+- Multi-variable sensitivity analysis  
 
 ### 🤖 AI Integration
 - Machine learning for performance prediction  
-- Smart parameter recommendation systems  
-- Integration with real plant datasets  
+- Smart recommendation systems  
 
 ### 🌐 Product Development
-- Full-stack deployment (React + FastAPI)  
-- User authentication and saved simulations  
-- Data upload and custom simulations  
-- Cloud-based engineering tool  
+- Full-stack deployment  
+- User data storage and simulations  
 
 ### 🧪 Research Extensions
-- Extend to nanofiltration and ultrafiltration  
-- Industrial plant-scale simulation  
-- CFD-based flow modeling  
+- Extend to other membrane processes  
+- Industrial-scale simulation  
 
 ---
 
-👉 This project can evolve into a **complete digital twin of membrane separation systems**, 
-bridging theoretical modeling with real-world engineering applications.
+👉 This project can evolve into a **digital twin of membrane systems** bridging theory and real-world applications.
 """)
