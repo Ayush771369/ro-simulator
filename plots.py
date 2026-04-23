@@ -88,75 +88,68 @@ def generate_tornado(baseline):
     param_keys = ["delta_P", "C", "T", "A", "B"]
 
     # -------------------------------
-    # Helper function
+    # Compute Water Flux (chosen output)
     # -------------------------------
-    def compute_outputs(b):
-        pi = osmotic_pressure_bar(b["C"], b["T"])
-        Jw = water_flux_LMH(b["delta_P"], b["C"], b["T"], b["A"])
-        R  = salt_rejection_pct(b["delta_P"], b["C"], b["T"], b["A"], b["B"])
-        Qp = permeate_flow_m3h(b["delta_P"], b["C"], b["T"], b["A"], b["B"], b["Am"])
-        return [Jw, R, Qp, pi]
+    def compute_Jw(b):
+        return water_flux_LMH(b["delta_P"], b["C"], b["T"], b["A"])
 
-    output_labels = [
-        "Jw (L/m²·h)",
-        "Salt Rejection (%)",
-        "Permeate Flow (m³/h)",
-        "Osmotic Pressure (bar)"
-    ]
+    base_val = compute_Jw(baseline)
 
-    base_out = compute_outputs(baseline)
-
-    fig, axes = plt.subplots(2, 2, figsize=(12, 8))
-    axes = axes.flatten()
+    impacts = []
+    low_vals = []
+    high_vals = []
 
     # -------------------------------
-    # LOOP OVER EACH OUTPUT
+    # Calculate impact
     # -------------------------------
-    for k, ax in enumerate(axes):
-        impacts = []
-        low_vals = []
-        high_vals = []
+    for key in param_keys:
+        low = baseline.copy()
+        high = baseline.copy()
 
-        # Compute impact for each parameter
-        for i, key in enumerate(param_keys):
-            low = baseline.copy()
-            high = baseline.copy()
+        low[key] *= (1 - VARIATION)
+        high[key] *= (1 + VARIATION)
 
-            low[key] *= (1 - VARIATION)
-            high[key] *= (1 + VARIATION)
+        low_out = compute_Jw(low)
+        high_out = compute_Jw(high)
 
-            low_out = compute_outputs(low)[k]
-            high_out = compute_outputs(high)[k]
+        impact = abs(high_out - low_out)
 
-            impact = abs(high_out - low_out)
+        impacts.append(impact)
+        low_vals.append(low_out - base_val)
+        high_vals.append(high_out - base_val)
 
-            impacts.append(impact)
-            low_vals.append(low_out - base_out[k])
-            high_vals.append(high_out - base_out[k])
+    # -------------------------------
+    # SORT (MOST → LEAST IMPACT)
+    # -------------------------------
+    order = np.argsort(impacts)[::-1]
 
-        # -------------------------------
-        # SORT BY IMPACT (DESCENDING)
-        # -------------------------------
-        order = np.argsort(impacts)[::-1]
+    sorted_labels = [param_labels[i] for i in order]
+    sorted_low = [low_vals[i] for i in order]
+    sorted_high = [high_vals[i] for i in order]
 
-        sorted_labels = [param_labels[i] for i in order]
-        sorted_low = [low_vals[i] for i in order]
-        sorted_high = [high_vals[i] for i in order]
+    y_pos = np.arange(len(param_labels))
 
-        y_pos = np.arange(len(param_labels))
+    # -------------------------------
+    # PLOT
+    # -------------------------------
+    fig, ax = plt.subplots(figsize=(8, 5))
 
-        # Plot bars
-        ax.barh(y_pos, sorted_low, color="#ff7b72", label="-20%")
-        ax.barh(y_pos, sorted_high, color="#3fb950", label="+20%")
+    ax.barh(y_pos, sorted_low, color="#ff7b72", label="-20%")
+    ax.barh(y_pos, sorted_high, color="#3fb950", label="+20%")
 
-        ax.set_yticks(y_pos)
-        ax.set_yticklabels(sorted_labels)
+    ax.set_yticks(y_pos)
+    ax.set_yticklabels(sorted_labels)
 
-        ax.set_title(f"{output_labels[k]}")
-        ax.axvline(0, color="black", linewidth=1)
+    ax.axvline(0, color="black", linewidth=1)
 
-        ax.grid(True, axis="x")
-        ax.legend()
+    ax.set_title("Tornado Chart (Impact on Water Flux Jw)")
+    ax.set_xlabel("Change from Baseline")
+
+    ax.grid(True, axis="x")
+    ax.legend()
+
+    # 🔥 MOST IMPORTANT AT TOP
+    ax.invert_yaxis()
 
     fig.tight_layout()
     return fig
