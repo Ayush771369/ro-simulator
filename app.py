@@ -58,13 +58,12 @@ baseline = {
 # -------------------------------
 # TABS
 # -------------------------------
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "Simulator",
     "OAT Analysis",
     "Tornado",
     "Heatmap",
-    "Equations",
-    "Process Dashboard"
+    "Equations"
 ])
 
 # ============================================================
@@ -88,20 +87,18 @@ with tab1:
     if delta_P < pi:
         st.warning("⚠️ Applied pressure is less than osmotic pressure → No filtration occurs!")
 
+    # -------------------------------
+    # PROCESS DASHBOARD (MOVED HERE)
+    # -------------------------------
     st.divider()
+    st.subheader("📊 Process Simulation Dashboard")
 
-    # Extra graph
-    st.subheader("📈 Pressure vs Water Flux")
+    st.markdown("""
+    This dashboard visualizes the overall behavior of the reverse osmosis system
+    under standard operating conditions.
+    """)
 
-    pressure_range = np.linspace(20, 80, 50)
-    flux_values = [water_flux_LMH(p, C, T, A) for p in pressure_range]
-
-    fig, ax = plt.subplots()
-    ax.plot(pressure_range, flux_values)
-    ax.set_xlabel("Pressure (bar)")
-    ax.set_ylabel("Water Flux (LMH)")
-    ax.set_title("Effect of Pressure on Flux")
-
+    fig = generate_simulation_dashboard()
     st.pyplot(fig)
 
 # ============================================================
@@ -187,17 +184,3 @@ Cp = B * Cs / (Jw + B)
 R  = (1 - Cp / Cf) * 100
 Qp = Jw * Am
 """)
-
-# ============================================================
-# TAB 6 — PROCESS DASHBOARD
-# ============================================================
-with tab6:
-    st.header("📊 Process Simulation Dashboard")
-
-    st.markdown("""
-    This dashboard visualizes the complete behavior of the reverse osmosis system
-    under typical operating conditions.
-    """)
-
-    fig = generate_simulation_dashboard()
-    st.pyplot(fig)
